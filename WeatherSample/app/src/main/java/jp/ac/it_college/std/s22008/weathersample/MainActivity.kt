@@ -1,7 +1,8 @@
 package jp.ac.it_college.std.s22008.weathersample
 
 import android.os.Bundle
-import android.util.Log
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
@@ -67,7 +68,29 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private class WeatherInfoBackgroundReceiver(val urlString: String) : Callable<String> {
+    private class WeatherInfoBackgroundReceiver(val urlString: String) : Callable<String>,
+        Parcelable {
+        constructor(parcel : Parcel) : this(parcel.readString()) {
+        }
+
+        override fun writeToParcel(parcel : Parcel, flags : Int) {
+            parcel.writeString(urlString)
+        }
+
+        override fun describeContents() : Int {
+            return 0
+        }
+
+        companion object CREATOR : Parcelable.Creator<WeatherInfoBackgroundReceiver> {
+            override fun createFromParcel(parcel : Parcel) : WeatherInfoBackgroundReceiver {
+                return WeatherInfoBackgroundReceiver(parcel)
+            }
+
+            override fun newArray(size : Int) : Array<WeatherInfoBackgroundReceiver?> {
+                return arrayOfNulls(size)
+            }
+        }
+
         @WorkerThread
         override fun call(): String {
             val url = URL(urlString)
@@ -83,10 +106,4 @@ class MainActivity : AppCompatActivity() {
 
                 con.disconnect()
                 result
-            } catch (ex: SocketTimeoutException) {
-                Log.w(DEBUG_TAG, "通信タイムアウト", ex)
-                ""
             }
-        }
-    }
-}

@@ -54,4 +54,11 @@ class CityData {
         City("鹿児島", "null"),
         City("沖縄", "那覇"),
         )
+
+    companion object {
+        val size: Int
+            get() {
+                TODO()
+            }
+    }
 }
